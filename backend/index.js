@@ -3,7 +3,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
+import connectDB from "./config/db.js";
+
 const app = express();
+
+connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
