@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import { HandleError } from "../utils/handleError.js"
-import jwt from 'jsonwebtoken';
+import { generateToken } from "../utils/jwt.js";
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
@@ -22,15 +22,20 @@ export const login = async (req, res) => {
       throw new HandleError("Invalid credentials", 401);
     }
 
-    const token = jwt.sign({
-      id: user._id,
-      username: user.username,
-      role: user.role,
-    }, process.env.JWT_SECRET, {
-      expiresIn: '1d'
+    const token = generateToken(user._id);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ token });
+    res.status(200).json({ 
+      id: user._id, 
+      username: user.username, 
+      role: user.role
+    });
   } catch (error) {
     throw new HandleError(error.message, error.statusCode || 500);
   }
@@ -52,16 +57,51 @@ export const register = async (req, res) => {
     
     const user = await User.create({ username, password });
 
-    const token = jwt.sign({
-      id: user._id,
-      username: user.username,
-      role: user.role,
-    }, process.env.JWT_SECRET, {
-      expiresIn: '1d'
+    const token = generateToken(user._id);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.status(201).json({ token });
+    res.status(201).json({ 
+      id: user._id, 
+      username: user.username, 
+      role: user.role 
+    });
   } catch (error) {
     throw new HandleError(error.message, error.statusCode || 500);
   }
+}
+
+export const checkAuth = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    throw new HandleError("Token not provided", 401);
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      throw new HandleError("User not found", 404);
+    }
+
+    res.status(200).json({
+      id: user._id,
+      username: user.username,
+      role: user.role,
+    });
+  } catch (error) {
+    throw new HandleError(error.message, error.statusCode || 500);
+  }
+}
+
+export const logout = async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logged out" });
 }
