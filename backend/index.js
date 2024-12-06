@@ -5,6 +5,8 @@ dotenv.config();
 
 import connectDB from "./config/db.js";
 
+import authRoutes from "./routes/authRoutes.js";
+
 const app = express();
 
 connectDB();
@@ -13,9 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
