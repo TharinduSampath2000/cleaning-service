@@ -5,6 +5,10 @@ import jwt from 'jsonwebtoken';
 export const login = async (req, res) => {
   const { username, password } = req.body;
 
+  if (!username || !password) {
+    throw new HandleError("Username and password are required", 400);
+  }
+
   try {
     const user = await User.findOne({ username });
 
@@ -28,12 +32,16 @@ export const login = async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
-    throw new HandleError(error.message, error.statusCode);
+    throw new HandleError(error.message, error.statusCode || 500);
   }
 };
 
 export const register = async (req, res) => {
   const { username, password } = req.body;
+
+  if (!username || !password) {
+    throw new HandleError("Username and password are required", 400);
+  }
 
   try {
     const existingUser = await User.findOne({ username });
@@ -54,6 +62,6 @@ export const register = async (req, res) => {
 
     res.status(201).json({ token });
   } catch (error) {
-    throw new HandleError(error.message, error.statusCode);
+    throw new HandleError(error.message, error.statusCode || 500);
   }
 }
