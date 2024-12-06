@@ -21,16 +21,20 @@ export const createBooking = async (req, res) => {
   }
 }
 
-export const getBookings = async (req, res) => {
+export const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find().populate(['service', 'user']);
+    res.status(200).json({ bookings });
+  } catch (error) {
+    HandleError(error.message, error.statusCode || 500);
+  }
+}
+
+export const getUserBookings = async (req, res) => {
   const user_id = req.user.id;
-  const isAdmin = req.user.role === 'admin';
 
   try {
-    const queryParam = isAdmin ? {} : { user_id };
-    const bookings = await Booking.find(queryParam)
-      .populate(['service', 'user'])
-      .sort({ date_time: -1 });
-
+    const bookings = await Booking.find({ user_id }).populate(['service', 'user']);
     res.status(200).json({ bookings });
   } catch (error) {
     HandleError(error.message, error.statusCode || 500);
@@ -39,10 +43,8 @@ export const getBookings = async (req, res) => {
 
 export const updateBooking = async (req, res) => {
   const { id } = req.params;
-  const { customer_name, address, date_time, service_id } = req.body;
-  const user_id = req.user.id;
-  const isAdmin = req.user.role === 'admin';
-
+  const { customer_name, address, date_time, service_id, status } = req.body;
+  
   try {
     const booking = await Booking.findById(id);
 
@@ -50,18 +52,14 @@ export const updateBooking = async (req, res) => {
       return HandleError('Booking not found', 404);
     }
 
-    if (!isAdmin && booking.user_id.toString() !== user_id) {
-      return HandleError('Unauthorized', 401);
-    }
-
     booking.customer_name = customer_name;
     booking.address = address;
     booking.date_time = date_time;
     booking.service_id = service_id;
-    await booking.save();
+    booking.status = status;
 
-    const updatedBooking = await booking.populate(['service', 'user']);
-    res.status(200).json(updatedBooking);
+    await booking.save();
+    res.status(200).json({ booking });
   } catch (error) {
     HandleError(error.message, error.statusCode || 500);
   }
@@ -69,8 +67,6 @@ export const updateBooking = async (req, res) => {
 
 export const deleteBooking = async (req, res) => {
   const { id } = req.params;
-  const user_id = req.user.id;
-  const isAdmin = req.user.role === 'admin';
 
   try {
     const booking = await Booking.findById(id);
@@ -79,11 +75,7 @@ export const deleteBooking = async (req, res) => {
       return HandleError('Booking not found', 404);
     }
 
-    if (!isAdmin && booking.user_id.toString() !== user_id) {
-      return HandleError('Unauthorized', 401);  
-    }
-
-    await booking.deleteOne();
+    await booking.remove();
     res.status(204).end();
   } catch (error) {
     HandleError(error.message, error.statusCode || 500);
