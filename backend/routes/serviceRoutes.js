@@ -1,6 +1,6 @@
 import { createService, deleteService, getServices, updateService } from "../controllers/serviceController.js";
 import express from "express";
-import { requireAdmin } from "../middleware/requireAdmin.js";
+import { requireAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
