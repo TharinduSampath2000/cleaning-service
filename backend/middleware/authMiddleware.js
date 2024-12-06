@@ -9,7 +9,6 @@ export const authenticate = (roles = []) => {
       if (!token) {
         throw new HandleError("Unauthorized", 401);
       }
-      console.log("Here");
       const decoded = verifyToken(token);
       const user = await User.findById(decoded.id).select("-password");
 

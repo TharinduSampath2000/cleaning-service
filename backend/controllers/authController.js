@@ -79,7 +79,6 @@ export const register = async (req, res, next) => {
 export const checkAuth = async (req, res, next) => {
   try {
     const user = req.user;
-    console.log(user);
     if (!user) {
       throw new HandleError("Unauthorized", 401);
     }

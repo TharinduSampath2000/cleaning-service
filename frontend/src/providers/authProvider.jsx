@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import propTypes from "prop-types";
 import { checkAuth, loginUser, logoutUser, registerUser } from "../api/authApi";
 import { AuthContext } from "../contexts/auth.context";
+import { toast } from "react-toastify";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -9,6 +10,10 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     checkAuthStatus();
+
+    if(user) {
+      window.location.href = `/${user.role}/`;
+    }
   }, []);
 
   const checkAuthStatus = async () => {
@@ -16,20 +21,24 @@ export const AuthProvider = ({ children }) => {
       const response = await checkAuth();
       setUser(response);
     } catch (error) {
-      console.log("User is not authenticated: ", error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (userData) => {
+  const userRegister = async (userData) => {
     try {
       const response = await registerUser(userData);
       setUser(response);
-      return true;
     } catch (error) {
-      console.error("Registration failed: ", error);
-      return false;
+      toast.error(
+        `Registration failed: ${
+          error.response.data.message || "An unexpected error occurred"
+        }`
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,10 +46,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await loginUser(userData);
       setUser(response);
-      return true;
+      toast.success("Login successful");
     } catch (error) {
-      console.error("Login failed: ", error);
-      return false;
+      toast.error(
+        `Login failed: ${
+          error.response.data.message || "An unexpected error occurred"
+        }`
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,12 +63,18 @@ export const AuthProvider = ({ children }) => {
       await logoutUser();
       setUser(null);
     } catch (error) {
-      console.error("Logout failed: ", error);
+      toast.error(
+        `Logout failed: ${
+          error.response.data.message || "An unexpected error occurred"
+        }`
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, userRegister, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
