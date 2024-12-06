@@ -1,4 +1,4 @@
-import Service from '../models/serviceModel.js';
+import Service from '../models/Service.js';
 import { HandleError } from '../utils/handleError.js';
 
 export const createService = async (req, res) => {
