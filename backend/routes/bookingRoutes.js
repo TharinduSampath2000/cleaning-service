@@ -1,15 +1,18 @@
 import express from 'express';
-import { createBooking, getBookings, deleteBooking, updateBooking } from '../controllers/bookingController.js';
-import { requireAdmin } from '../middleware/authMiddleware.js';
+import { createBooking, getUserBookings, getAllBookings, deleteBooking, updateBooking } from '../controllers/bookingController.js';
+import { authenticate } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .post(createBooking)
-  .get(requireAdmin, getBookings);
+  .post(authenticate(['user']), createBooking)
+  .get(authenticate(['admin']), getAllBookings);
 
 router.route('/:id')
-  .delete(requireAdmin, deleteBooking)
-  .put(requireAdmin, updateBooking);
+  .delete(authenticate(['admin']), deleteBooking)
+  .put(authenticate(['admin', 'user']), updateBooking);
+
+router.route('/user')
+  .get(authenticate(['user']), getUserBookings);
 
 export default router;
