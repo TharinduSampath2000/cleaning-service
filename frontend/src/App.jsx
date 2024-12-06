@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import ProtectedRoute from "./components/ProtectedRoute"
-import { AuthProvider } from "./context/auth.context"
+import { AuthProvider } from "./providers/authProvider"
 import Signin from "./pages/Signin"
 import Signup from "./pages/Signup"
 import Unauthorized from "./pages/Unauthorized"
@@ -13,6 +13,8 @@ const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Navigate to="/sign-in" />} />
+
           <Route path="/sign-in" element={<Signin />} />
           <Route path="/sign-up" element={<Signup />} />
           <Route path="/unauthorized" element={<Unauthorized />} />

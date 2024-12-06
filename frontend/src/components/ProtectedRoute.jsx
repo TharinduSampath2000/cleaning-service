@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/auth.context";
+import { useAuth } from "../hooks/useAuth";
 import propTypes from "prop-types";
 
 const ProtectedRoute = ({ roles= [], children }) => {

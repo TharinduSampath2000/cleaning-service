@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/auth.context";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const Signin = () => {
@@ -32,6 +32,7 @@ const Signin = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="string"
+          name="username"
           value={formData.username}
           onChange={(e) => handleChange(e)}
           placeholder="Username"
@@ -39,6 +40,7 @@ const Signin = () => {
         />
         <input
           type="password"
+          name="password"
           value={formData.password}
           onChange={(e) => handleChange(e)}
           placeholder="Password"

@@ -1,8 +1,7 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import propTypes from "prop-types";
 import { checkAuth, loginUser, logoutUser, registerUser } from "../api/authApi";
-
-const AuthContext = createContext(null);
+import { AuthContext } from "../contexts/auth.context";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -17,7 +16,7 @@ export const AuthProvider = ({ children }) => {
       const response = await checkAuth();
       setUser(response);
     } catch (error) {
-      console.error("Auth status check failed: ", error);
+      console.log("User is not authenticated: ", error);
     } finally {
       setLoading(false);
     }
@@ -59,13 +58,9 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export const useAuth = () => {
-  return useContext(AuthContext);
-}
+};
 
 AuthProvider.propTypes = {
   userData: propTypes.object,
   children: propTypes.node,
-}
+};

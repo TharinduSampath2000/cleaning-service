@@ -2,14 +2,14 @@ import User from '../models/User.js';
 import { HandleError } from "../utils/handleError.js"
 import { generateToken } from "../utils/jwt.js";
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    throw new HandleError("Username and password are required", 400);
-  }
-
   try {
+    if (!username || !password) {
+      throw new HandleError("Username and password are required", 400);
+    }
+
     const user = await User.findOne({ username });
 
     if (!user) {
@@ -37,18 +37,18 @@ export const login = async (req, res) => {
       role: user.role
     });
   } catch (error) {
-    throw new HandleError(error.message, error.statusCode || 500);
+    next(error);
   }
 };
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    throw new HandleError("Username and password are required", 400);
-  }
-
   try {
+    if (!username || !password) {
+      throw new HandleError("Username and password are required", 400);
+    }
+
     const existingUser = await User.findOne({ username });
 
     if (existingUser) {
@@ -72,32 +72,24 @@ export const register = async (req, res) => {
       role: user.role 
     });
   } catch (error) {
-    throw new HandleError(error.message, error.statusCode || 500);
+    next(error);
   }
 }
 
-export const checkAuth = async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    throw new HandleError("Token not provided", 401);
-  }
-
+export const checkAuth = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-
+    const user = req.user;
+    console.log(user);
     if (!user) {
-      throw new HandleError("User not found", 404);
+      throw new HandleError("Unauthorized", 401);
     }
-
-    res.status(200).json({
-      id: user._id,
-      username: user.username,
-      role: user.role,
+    res.status(200).json({ 
+      id: user._id, 
+      username: user.username, 
+      role: user.role 
     });
   } catch (error) {
-    throw new HandleError(error.message, error.statusCode || 500);
+    next(error);
   }
 }
 

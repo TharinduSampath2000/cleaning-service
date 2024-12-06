@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import connectDB from "./config/db.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import { errorHandler } from "./middleware/errorMiddleware.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
@@ -25,7 +25,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/bookings", bookingRoutes);
 
-app.use(notFound);
 app.use(errorHandler);
 
 connectDB();

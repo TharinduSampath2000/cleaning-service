@@ -15,6 +15,7 @@ axios.interceptors.request.use(
   error => {
     if (error.response.status === 401) {
       window.location.href = '/sign-in';
+      return Promise.reject(error);
     }
     return Promise.reject(error);
   }
@@ -27,6 +28,7 @@ axios.interceptors.response.use(
   error => {
     if (error.response.status === 401) {
       window.location.href = '/sign-in';
+      return Promise.reject(error);
     }
     return Promise.reject(error);
   }
