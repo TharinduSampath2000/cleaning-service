@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getServices } from "../../api/serviceApi";
-import { createService, editService } from "../../api/serviceApi";
+import { createService, editService, deleteService } from "../../api/serviceApi";
 import AddServiceModal from "../../components/AddServiceModal";
 import EditServiceModal from "../../components/EditServiceModal";
 
@@ -28,20 +28,20 @@ const Services = () => {
   };
 
   const submitAddHandler = async (data) => {
-    await createService(data);
-    setServices([...services, data]);
+    const response = await createService(data);
+    setServices([...services, response.service]);
     closeAddModal();
   };
 
   const submitEditHandler = async (data) => {
-    const newData = {
-      id: selectedService.id,
-      name: data.name,
-    };
-
-    await editService(newData);
-    setServices([...services, data]);
+    const response = await editService(selectedService._id, data);
+    setServices(services.map((service) => (service._id === selectedService._id ? response.service : service)));
     closeEditModal();
+  };
+
+  const deleteHandler = async (serviceId) => {
+    await deleteService(serviceId);
+    setServices(services.filter((service) => service._id !== serviceId));
   };
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const Services = () => {
                   <button className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onClick={() => openEditModal(service)}>
                     Edit
                   </button>
-                  <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                  <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={() => deleteHandler(service._id)}>
                     Delete
                   </button>
                 </td>
