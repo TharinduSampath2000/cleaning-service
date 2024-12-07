@@ -31,6 +31,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await registerUser(userData);
       setUser(response);
+      toast.success("Registration successful");
+      window.location.href = `/${user.role}/`;
     } catch (error) {
       toast.error(
         `Registration failed: ${
@@ -47,6 +49,7 @@ export const AuthProvider = ({ children }) => {
       const response = await loginUser(userData);
       setUser(response);
       toast.success("Login successful");
+      window.location.href = `/${user.role}/`;
     } catch (error) {
       toast.error(
         `Login failed: ${
@@ -62,6 +65,8 @@ export const AuthProvider = ({ children }) => {
     try {
       await logoutUser();
       setUser(null);
+      toast.success("Logout successful");
+      window.location.href = "/";
     } catch (error) {
       toast.error(
         `Logout failed: ${

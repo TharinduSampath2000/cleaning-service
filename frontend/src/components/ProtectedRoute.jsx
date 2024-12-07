@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import propTypes from "prop-types";
+import Navbar from "./Navbar";
 
 const ProtectedRoute = ({ roles= [], children }) => {
   const { user, loading } = useAuth();
@@ -18,7 +19,12 @@ const ProtectedRoute = ({ roles= [], children }) => {
     return <Navigate to="/unauthorized" />;
   }
 
-  return children;
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  )
 }
 
 export default ProtectedRoute

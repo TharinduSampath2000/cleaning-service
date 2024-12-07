@@ -28,3 +28,10 @@ export const registerSchema = loginSchema
     }
     return true;
   });
+
+export const serviceSchema = z.object({
+  name: z
+    .string()
+    .min(3, "Service name must be at least 3 characters long")
+    .max(100, "Service name must be at most 100 characters long")
+});

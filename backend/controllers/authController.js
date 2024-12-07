@@ -93,6 +93,16 @@ export const checkAuth = async (req, res, next) => {
 }
 
 export const logout = async (req, res) => {
-  res.clearCookie("token");
-  res.status(200).json({ message: "Logged out" });
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      throw new HandleError("Unauthorized", 401);
+    }
+
+    res.clearCookie("token");
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    next(error);
+  }
 }

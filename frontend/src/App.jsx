@@ -7,6 +7,8 @@ import Unauthorized from "./pages/Unauthorized"
 import AdminDashboard from "./pages/admin/AdminDashboard"
 import NotFound from "./pages/NotFound"
 import UserDashboard from "./pages/user/UserDashboard"
+import Bookings from "./pages/admin/Bookings"
+import Services from "./pages/admin/Services"
 
 const App = () => {
   return (
@@ -25,6 +27,8 @@ const App = () => {
               <ProtectedRoute roles={["admin"]}>
                 <Routes>
                   <Route path="/" element={<AdminDashboard />} />
+                  <Route path="/bookings" element={<Bookings />} />
+                  <Route path="/services" element={<Services />} />
                 </Routes> 
               </ProtectedRoute>
             } 
